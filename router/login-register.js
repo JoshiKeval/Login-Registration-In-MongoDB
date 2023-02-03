@@ -1,6 +1,7 @@
 const User = require("../models/userschema");
 const jwt = require("jsonwebtoken");
-
+const cookie=require("cookie-parser");
+const JWT=require("../helper/authentication");
 ///////////////////////////////////////////////////////////////////// signup
 
 const signup = async (req, res) => {
@@ -38,12 +39,10 @@ const signin = async (req, res) => {
   if (useremail.password == password ) {
     ///////////////////////////////////token
     let personalData = { email };
-    let token = jwt.sign({ personalData }, process.env.secreat_key, {
-      expiresIn: process.env.token_expire,
-    });
+    let token=JWT.generateToken(personalData);
     console.log(token);
-    return res.status(200).json({
-      message: "Login Successfull",
+    res.cookie(token, {httpOnly:true}).status(200).json({
+      message: "Login Successfull",data:{email}
     });
   } else{
     console.log("brother");
