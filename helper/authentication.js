@@ -16,9 +16,11 @@ let verifyToken=(req,res,next)=>{
         }
         const decodeToken=jwt.verify(token,process.env.secreat_key);
         console.log(decodeToken);
+        const email = decodeToken.email;
+        res.locals.email = email;
         next();
     } catch (error) {
         
     }
 }
-module.exports={generateToken}
+module.exports={generateToken, verifyToken}
