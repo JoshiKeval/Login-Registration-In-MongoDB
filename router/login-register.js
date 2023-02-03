@@ -1,17 +1,20 @@
 const User = require("../models/userschema");
 const jwt = require("jsonwebtoken");
-const cookie=require("cookie-parser");
-const JWT=require("../helper/authentication");
+const cookie = require("cookie-parser");
+const JWT = require("../helper/authentication");
+const md5=require("md5");
+
 ///////////////////////////////////////////////////////////////////// signup
 
 const signup = async (req, res) => {
-  const { name, email, password } = req.body;
+  let { name, email, password } = req.body;
   if (!name || !email || !password) {
     return res.status(401).json({
       message: "Please Provide Required Information",
     });
   }
-  const userData = { name, email, password };
+  password=md5(password);
+  const userData = { name, email, password};
   const user = await User.findOne({ email });
   if (user) {
     return res.status(401).json({
@@ -36,20 +39,20 @@ const signin = async (req, res) => {
   }
   const useremail = await User.findOne({ email: email });
 
-  if (useremail.password == password ) {
+  if (useremail.password == md5(password)) {
     ///////////////////////////////////token
     let personalData = { email };
-    let token=JWT.generateToken(personalData);
+    let token = JWT.generateToken(personalData);
     console.log(token);
-    res.cookie(token, {httpOnly:true}).status(200).json({
-      message: "Login Successfull",data:{email}
+    res.cookie(token, { httpOnly: true }).status(200).json({
+      message: "Login Successfull",
+      data: { email },
     });
-  } else{
+  } else {
     console.log("brother");
     return res.status(401).json({
       message: "Invalid Details",
     });
-
   }
 };
 
